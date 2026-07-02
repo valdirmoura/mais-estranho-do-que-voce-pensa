@@ -1,0 +1,69 @@
+import type { Resultado as R, CoreMeta } from "../lib/tipos";
+
+const COMPARACOES: [number, string][] = [
+  [1_000, "menos gente que um show de bairro"],
+  [10_000, "cabe num ginásio pequeno"],
+  [100_000, "menos que um Maracanã lotado"],
+  [1_000_000, "menos que a população de Florianópolis"],
+];
+
+function comparar(pessoas: number): string {
+  for (const [teto, frase] of COMPARACOES) if (pessoas < teto) return frase;
+  return "ainda assim, uma fatia minúscula do Brasil";
+}
+
+export default function Resultado({ r, meta, urlShare, aoRefazer }:
+  { r: R; meta: CoreMeta; urlShare: string; aoRefazer: () => void }) {
+  const compartilhar = async () => {
+    const dados = { title: "Você é mais estranho do que pensa",
+      text: "Descobri quão raro é meu perfil no Brasil. E o seu?", url: urlShare };
+    if (navigator.share) await navigator.share(dados);
+    else { await navigator.clipboard.writeText(urlShare); alert("Link copiado!"); }
+  };
+  return (
+    <div className="space-y-6 text-center">
+      {r.tipo === "exato" ? (
+        <>
+          <p className="text-lg">Sua combinação exata aparece em</p>
+          <p className="text-6xl font-black text-emerald-700">
+            1 em {r.umEmX.toLocaleString("pt-BR")}
+          </p>
+          <p className="text-lg">
+            brasileiros adultos — cerca de {r.pessoas.toLocaleString("pt-BR")} pessoas.
+            <br /><span className="text-neutral-500">({comparar(r.pessoas)})</span>
+          </p>
+          <details className="text-sm text-neutral-500">
+            <summary>Como esse número foi calculado?</summary>
+            <p className="mt-2 text-left">
+              Fonte: {meta.fonte}, amostra de {meta.total_n.toLocaleString("pt-BR")}{" "}
+              pessoas com pesos que projetam a população adulta
+              ({Math.round(meta.total_pop / 1e6)} milhões). Sua combinação teve{" "}
+              {r.nAmostral.toLocaleString("pt-BR")} respondentes na amostra.
+              Nenhuma resposta sua saiu do seu aparelho.
+            </p>
+          </details>
+        </>
+      ) : (
+        <>
+          <p className="text-lg">Sua combinação é tão rara que</p>
+          <p className="text-4xl font-black text-emerald-700">
+            não apareceu nem uma vez
+          </p>
+          <p className="text-lg">
+            entre {r.limiteUmEm.toLocaleString("pt-BR")} entrevistados do IBGE.
+            Estimativa honesta: menos de 1 em {r.limiteUmEm.toLocaleString("pt-BR")}.
+          </p>
+        </>
+      )}
+      <div className="flex justify-center gap-3">
+        <button onClick={compartilhar}
+          className="rounded-xl bg-emerald-700 px-6 py-3 font-bold text-white">
+          Compartilhar meu resultado
+        </button>
+        <button onClick={aoRefazer} className="rounded-xl border px-6 py-3">
+          Refazer
+        </button>
+      </div>
+    </div>
+  );
+}
