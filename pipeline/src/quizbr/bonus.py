@@ -32,6 +32,18 @@ MAPA_RELIGIAO = {
     # None e o respondente é descartado (ver recodificar_religiao).
 }
 
+# Mapeamento código de resposta (escolaridade, no .sav) -> índice em escol5.
+# CONFIRMAR contra o codebook real do ESEB 2022 antes do run oficial — os
+# códigos abaixo são um placeholder plausível e devem ser ajustados após inspecionar
+# pyreadstat.read_sav(..., apply_value_formats=False) + meta.variable_value_labels.
+MAPA_ESCOLARIDADE = {
+    1: 0,   # escolaridade mínima -> 0
+    2: 0, 3: 1,  # placeholder para códigos intermediários -> 0 ou 1
+    4: 1, 5: 2, 6: 3, 7: 4,  # escolaridade crescente -> 1 a 4
+    # NS/NR (ex.: 97, 98, 99) não mapeados aqui de propósito -> .get() retorna
+    # None e o respondente é descartado (ver recodificar_escolaridade).
+}
+
 # Substrings usadas para sugerir colunas candidatas quando um nome do
 # MAPA_ESEB não bate com o .sav (religião, escolaridade, sexo, idade, UF,
 # escala esquerda-direita).
@@ -123,6 +135,12 @@ def recodificar_religiao(codigo):
     return MAPA_RELIGIAO.get(int(codigo))
 
 
+def recodificar_escolaridade(codigo):
+    if codigo is None:
+        return None
+    return MAPA_ESCOLARIDADE.get(int(codigo))
+
+
 def recodificar_respondente(linha):
     """Recodifica uma linha bruta do .sav (dict de coluna -> valor) para
     dict(regiao, sexo, f3, e3, rel, pol). Retorna None se algum campo
@@ -139,14 +157,12 @@ def recodificar_respondente(linha):
     regiao = _regiao(uf)
     sexo = {1: 0, 2: 1}.get(int(sexo_bruto)) if sexo_bruto is not None else None
     faixa6 = _faixa6(idade)
-    escol5 = int(escol_bruta) if escol_bruta is not None else None
+    escol5 = recodificar_escolaridade(escol_bruta)
     rel = recodificar_religiao(religiao_bruta)
     pol = politica_de_escala(
         int(escala_bruta) if escala_bruta is not None else None)
 
     if None in (regiao, sexo, faixa6, escol5, rel):
-        return None
-    if not (0 <= escol5 <= 4):
         return None
     return dict(regiao=regiao, sexo=sexo, f3=fe3(faixa6), e3=es3(escol5),
                 rel=rel, pol=pol)

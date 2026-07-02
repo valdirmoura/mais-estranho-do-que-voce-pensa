@@ -1,4 +1,8 @@
-from quizbr.bonus import fe3, es3, politica_de_escala, montar_niveis
+from quizbr.bonus import (
+    fe3, es3, politica_de_escala, montar_niveis,
+    recodificar_escolaridade, recodificar_respondente,
+    MAPA_ESEB
+)
 
 def test_grupos():
     assert [fe3(i) for i in range(6)] == [0, 0, 1, 1, 2, 2]
@@ -21,3 +25,17 @@ def test_recuo_para_nivel_com_n_suficiente():
     assert "0|0|0|0" not in dist["0"]
     # nível global sempre existe
     assert dist["3"][""]["1|2"] == 1.0
+
+def test_escolaridade_unmapped_drops_respondent():
+    # Código de escolaridade não mapeado (ex: 99 para NS/NR) retorna None,
+    # respondente é descartado, não miscategorizado.
+    linha = {
+        MAPA_ESEB["uf"]: 1,
+        MAPA_ESEB["sexo"]: 1,
+        MAPA_ESEB["idade"]: 30,
+        MAPA_ESEB["escolaridade"]: 99,  # Unmapped code
+        MAPA_ESEB["religiao"]: 1,
+        MAPA_ESEB["escala_lr"]: 5,
+    }
+    resultado = recodificar_respondente(linha)
+    assert resultado is None
