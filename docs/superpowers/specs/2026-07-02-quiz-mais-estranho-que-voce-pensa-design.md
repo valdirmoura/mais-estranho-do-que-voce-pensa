@@ -28,7 +28,8 @@ contexto da eleição de 2026 como gancho editorial.
 
 ## Arquitetura
 
-Site 100% estático com tabelas pré-computadas. Nenhum backend em produção.
+Site estático com tabelas pré-computadas. Único código de servidor: endpoint
+mínimo do contador anônimo de conclusões (ver "Medição de uso").
 
 ```
 pipeline (Python, offline)          site (Astro + React island)
@@ -70,8 +71,9 @@ pipeline (Python, offline)          site (Astro + React island)
   embutido.
 - Fluxo do quiz: 8 perguntas → resultado → convite ao bônus (opt-in) →
   resultado refinado com disclaimer.
-- Lookup 100% client-side nos JSONs. Nada é enviado a servidor — destacar
-  como argumento de privacidade.
+- Lookup 100% client-side nos JSONs. Nenhuma resposta é enviada a servidor
+  (apenas ping de conclusão sem payload) — destacar como argumento de
+  privacidade.
 - Compartilhamento: resultado codificado em query params + Web Share API +
   botão copiar. URL compartilhada renderiza o resultado sem respostas cruas
   expostas além das categorias.
@@ -97,6 +99,16 @@ pipeline (Python, offline)          site (Astro + React island)
   valores negativos, esquema dos JSONs, regra de recuo do bônus.
 - **Site (vitest):** lookup de perfil conhecido → número esperado; célula
   vazia → mensagem de piso; encode/decode de URL de compartilhamento.
+
+## Medição de uso
+
+- Vercel Analytics para pageviews.
+- Contador anônimo de conclusões: ao finalizar o quiz, o site envia um ping
+  sem payload de respostas (endpoint mínimo — Vercel Edge Function + KV ou
+  equivalente). Nenhuma resposta ou combinação é transmitida.
+- Site pode exibir "X pessoas já fizeram o quiz".
+- Frase de privacidade permanece verdadeira e vira destaque: "suas respostas
+  não saem do seu aparelho".
 
 ## Deploy
 
