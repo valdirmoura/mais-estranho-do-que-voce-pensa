@@ -6,7 +6,16 @@ from quizbr import config, leitor
 from quizbr.recode import DIMENSOES, recodificar_linha
 
 
-def agregar(df, peso_col, sm):
+def agregar(df, peso_col, sm, arredondar=True):
+    """Agrega df em células por dimensão, somando peso e contando n.
+
+    Por padrão (arredondar=True) os pesos/total_pop retornados já vêm
+    arredondados para 1 casa decimal — comportamento público estável usado
+    pelos testes e por chamadas avulsas. Internamente (ex.: pipeline em
+    pedaços, ver main()) usa-se arredondar=False para acumular valores RAW
+    e só arredondar uma única vez, no momento da serialização final —
+    evitando drift de arredondamento composto ao longo de vários pedaços.
+    """
     cells = defaultdict(lambda: [0.0, 0])
     total_pop, total_n = 0.0, 0
     cols = [c for c in df.columns if c != peso_col]
@@ -21,16 +30,29 @@ def agregar(df, peso_col, sm):
         cells[chave][1] += 1
         total_pop += peso
         total_n += 1
+    meta = {
+        "fonte": f"PNAD Contínua {config.ANO} (IBGE)",
+        "ano": config.ANO,
+        "salario_minimo": sm,
+        "total_pop": round(total_pop, 1) if arredondar else total_pop,
+        "total_n": total_n,
+        "dims": [[nome, labels] for nome, labels in DIMENSOES],
+    }
+    if arredondar:
+        cells_out = {k: [round(p, 1), n] for k, (p, n) in cells.items()}
+    else:
+        cells_out = {k: [p, n] for k, (p, n) in cells.items()}
+    return {"meta": meta, "cells": cells_out}
+
+
+def _arredondar_core(core):
+    """Aplica o arredondamento final (1 casa decimal) a um core com pesos
+    RAW — usado uma única vez, no ponto de serialização."""
+    meta = dict(core["meta"])
+    meta["total_pop"] = round(meta["total_pop"], 1)
     return {
-        "meta": {
-            "fonte": f"PNAD Contínua {config.ANO} (IBGE)",
-            "ano": config.ANO,
-            "salario_minimo": sm,
-            "total_pop": round(total_pop, 1),
-            "total_n": total_n,
-            "dims": [[nome, labels] for nome, labels in DIMENSOES],
-        },
-        "cells": {k: [round(p, 1), n] for k, (p, n) in cells.items()},
+        "meta": meta,
+        "cells": {k: [round(p, 1), n] for k, (p, n) in core["cells"].items()},
     }
 
 
@@ -42,8 +64,11 @@ def _rdpc_fallback(df):
 
 
 def _juntar_cores(a, b):
-    """Combina dois cores (saída de agregar()) célula a célula, somando
-    peso e n. meta é recomputada a partir das células combinadas."""
+    """Combina dois cores (saída de agregar(..., arredondar=False)) célula a
+    célula, somando peso RAW e n. meta é recomputada a partir das células
+    combinadas. Não arredonda — os cores de entrada e o resultado devem
+    conter pesos RAW; o arredondamento acontece uma única vez, no momento
+    da serialização final (ver _arredondar_core / main())."""
     cells = defaultdict(lambda: [0.0, 0])
     for k, (p, n) in a["cells"].items():
         cells[k][0] += p
@@ -51,14 +76,14 @@ def _juntar_cores(a, b):
     for k, (p, n) in b["cells"].items():
         cells[k][0] += p
         cells[k][1] += n
-    total_pop = round(sum(p for p, _ in cells.values()), 1)
+    total_pop = sum(p for p, _ in cells.values())
     total_n = sum(n for _, n in cells.values())
     meta = dict(a["meta"])
     meta["total_pop"] = total_pop
     meta["total_n"] = total_n
     return {
         "meta": meta,
-        "cells": {k: [round(p, 1), n] for k, (p, n) in cells.items()},
+        "cells": {k: [p, n] for k, (p, n) in cells.items()},
     }
 
 
@@ -85,11 +110,17 @@ def main():
         pedaco["RDPC"] = (pedaco[config.VAR_RDPC] if tem_rdpc
                            else _rdpc_fallback(pedaco))
         pedaco["INTERNET"] = pedaco[config.VAR_INTERNET]
-        parcial = agregar(pedaco, peso_col=config.PESO, sm=config.SALARIO_MINIMO)
+        parcial = agregar(pedaco, peso_col=config.PESO, sm=config.SALARIO_MINIMO,
+                           arredondar=False)
         core = parcial if core is None else _juntar_cores(core, parcial)
         n_pedacos += 1
         print(f"  pedaço {n_pedacos}: +{parcial['meta']['total_n']} linhas "
               f"válidas (acumulado n={core['meta']['total_n']})")
+
+    # Arredonda uma única vez, aqui, no ponto de serialização — os pedaços
+    # acumulados acima carregam pesos RAW (sem arredondamento) para evitar
+    # drift composto ao longo de vários pedaços.
+    core = _arredondar_core(core)
 
     from quizbr.sanidade import checar_sanidade
     checar_sanidade(core)
