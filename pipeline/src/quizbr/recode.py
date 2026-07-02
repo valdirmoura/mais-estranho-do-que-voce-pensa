@@ -21,7 +21,7 @@ DIMENSOES = [
         "Empregado formal", "Empregado informal",
         "Conta própria / empregador", "Desempregado", "Fora da força de trabalho",
     ]),
-    ("internet", ["Usa internet", "Não usa internet"]),
+    ("internet", ["Com internet no domicílio", "Sem internet no domicílio"]),
 ]
 
 

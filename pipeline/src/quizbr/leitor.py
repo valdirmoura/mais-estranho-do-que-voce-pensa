@@ -34,3 +34,17 @@ def ler_microdados(caminho_txt, posicoes, variaveis):
     for c in variaveis:
         df[c] = pd.to_numeric(df[c], errors="coerce")
     return df
+
+
+def ler_microdados_em_pedacos(caminho_txt, posicoes, variaveis,
+                               chunksize=200_000):
+    """Como ler_microdados, mas em pedaços (generator de DataFrames) para
+    não carregar arquivos de microdados muito grandes (~1.5GB+) de uma vez
+    na memória. Mesma validação e mesma conversão numérica por coluna."""
+    validar_variaveis(posicoes, variaveis)
+    colspecs = [posicoes[v] for v in variaveis]
+    for pedaco in pd.read_fwf(caminho_txt, colspecs=colspecs, names=variaveis,
+                               header=None, dtype=str, chunksize=chunksize):
+        for c in variaveis:
+            pedaco[c] = pd.to_numeric(pedaco[c], errors="coerce")
+        yield pedaco
