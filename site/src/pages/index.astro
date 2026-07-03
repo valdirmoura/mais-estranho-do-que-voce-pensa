@@ -1,16 +1,139 @@
 ---
 import '../styles/global.css';
 import Quiz from "../components/Quiz";
+
+const titulo = "Você é mais estranho do que pensa";
+const descricao =
+  "Combine sexo, idade, região, raça, escolaridade, renda, trabalho e internet e descubra quantos brasileiros adultos compartilham exatamente o seu perfil — com dados reais do IBGE (PNAD Contínua 2025).";
+const url = "https://site-kappa-one-5q7jzjfra0.vercel.app/";
 ---
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Você é mais estranho do que pensa</title>
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={url} />
+    <meta property="og:locale" content="pt_BR" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descricao} />
+
+    <link rel="icon" href="/favicon.svg" />
   </head>
   <body class="mx-auto max-w-2xl p-6 font-sans">
-    <h1 class="mb-8 text-4xl font-black">Você é mais estranho do que pensa</h1>
+    <h1 class="mb-4 text-4xl font-black">{titulo}</h1>
+
+    <section class="prose prose-neutral mb-10 max-w-none text-neutral-700">
+      <p>
+        Pense no brasileiro médio. Agora responda: você é ele? Quase
+        certamente não. "Brasileiro médio" é uma ficção estatística — uma
+        média de sexo, idade, região, cor, escolaridade, renda, trabalho e
+        acesso à internet que não bate exatamente com quase ninguém. Este
+        quiz não mede se você é normal. Ele mede uma coisa mais concreta e,
+        de certa forma, mais interessante: entre os quase 161 milhões de
+        adultos do Brasil, quantos têm a <em>combinação exata</em> das suas
+        oito características?
+      </p>
+      <p>
+        Isso importa mais agora do que de costume. Estamos a caminho de
+        2026, ano de eleição presidencial, e cada bolha — de WhatsApp, de
+        timeline, de bairro — tende a achar que representa o país. Não
+        representa. O Brasil é grande, desigual e plural demais para caber
+        na experiência de qualquer grupo, inclusive no seu. Ver o próprio
+        perfil reduzido a um número — "1 em 40 mil", "1 em 2 milhões" — é um
+        jeito rápido de lembrar que a sua realidade é uma entre muitas, não
+        a régua contra a qual as outras deveriam ser medidas.
+      </p>
+      <p>
+        Responda às oito perguntas abaixo. No fim, você recebe sua raridade
+        estimada e pode comparar com a de quem quiser — inclusive testando
+        um bônus opcional com religião e posicionamento político.
+      </p>
+    </section>
+
     <Quiz client:load />
+
+    <section class="prose prose-neutral mt-12 max-w-none border-t pt-8 text-neutral-700">
+      <h2 class="text-2xl font-bold text-neutral-900">Metodologia</h2>
+      <p>
+        O núcleo do quiz — as oito primeiras perguntas — vem de uma única
+        fonte: a <strong>PNAD Contínua 2025, visita 1</strong> (Pesquisa
+        Nacional por Amostra de Domicílios Contínua, IBGE). São 308.384
+        entrevistados adultos, cujas respostas carregam pesos amostrais que,
+        somados, projetam a população real: cerca de 161,2 milhões de
+        adultos no Brasil.
+      </p>
+      <p>
+        A cada uma das suas respostas — sexo, idade, região, cor/raça,
+        escolaridade, renda domiciliar per capita, situação de trabalho e
+        acesso à internet no domicílio — o quiz cruza as oito dimensões e
+        localiza a célula correspondente entre as 20.742 combinações
+        possíveis. O número que aparece na tela é a soma dos pesos amostrais
+        de todo mundo, na pesquisa, que caiu exatamente nessa célula.
+      </p>
+      <p>
+        Um ponto importante: isso <strong>não é</strong> multiplicar oito
+        probabilidades independentes entre si. Se fizéssemos isso,
+        estaríamos assumindo que escolaridade, renda, região e as demais
+        características não têm relação umas com as outras — o que é falso.
+        Escolaridade e renda caminham juntas; região e cor/raça também.
+        Multiplicar probabilidades marginais ignora essas correlações reais
+        e produz números fantasiosos, tanto para mais quanto para menos. Por
+        isso o quiz faz <strong>contagem direta</strong> na amostra
+        ponderada: cada combinação é observada (ou não) nos dados reais, e é
+        exatamente por causa das correlações do mundo real que uma
+        combinação pode ser muito mais comum — ou muito mais rara — do que a
+        conta "ingênua" sugeriria.
+      </p>
+      <p>
+        Com 20.742 células possíveis e "apenas" 308 mil entrevistados, é
+        normal que combinações raras não apareçam nenhuma vez na amostra.
+        Quando isso acontece, o quiz nunca diz "0 pessoas" — isso seria uma
+        afirmação que os dados não sustentam. Em vez disso, ele mostra um
+        piso honesto: <em>"menos de 1 em 308.384"</em>, o tamanho da própria
+        amostra. É a forma mais correta de dizer "não observamos essa
+        combinação, mas isso não prova que ela não exista".
+      </p>
+      <p>
+        O bônus opcional — religião e posicionamento político — não está na
+        PNAD, então usamos uma segunda fonte: o{" "}
+        <strong>ESEB 2022</strong> (Estudo Eleitoral Brasileiro,
+        CESOP/UNICAMP). Como essa amostra é bem menor, a estimativa é
+        calculada de forma condicional ao seu perfil demográfico (região,
+        sexo, idade, escolaridade), recuando para grupos mais amplos quando
+        necessário. É uma aproximação honesta, não uma contagem exata — por
+        isso o bônus aparece separado do resultado principal, com esse
+        aviso explícito.
+      </p>
+      <p>
+        Sobre privacidade: o cálculo roda inteiramente no seu navegador. Suas
+        respostas nunca são enviadas a nenhum servidor. O único dado que sai
+        do seu aparelho é um contador anônimo de "quiz concluído", sem
+        nenhuma informação sobre quais foram suas respostas.
+      </p>
+      <p>
+        Código-fonte, pipeline de dados e detalhes técnicos estão no
+        repositório do projeto.
+      </p>
+      <h2 class="text-2xl font-bold text-neutral-900">Crédito</h2>
+      <p>
+        A ideia original deste quiz é do Uri, do site atvbt.com:{" "}
+        <a
+          href="https://www.atvbt.com/youre-weirder-than-you-think"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-emerald-700 underline"
+        >
+          "You're Weirder Than You Think"
+        </a>. Esta é uma adaptação para dados brasileiros, com fonte, metodologia
+        e piso estatístico próprios.
+      </p>
+    </section>
   </body>
 </html>
-
