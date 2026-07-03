@@ -121,7 +121,9 @@ mediante cadastro gratuito:
 4. Baixe o arquivo em formato SPSS (`.sav`).
 5. Salve como `pipeline/raw/eseb2022.sav`.
 
-## Dados brutos ficam fora do git
+## Dados brutos e derivados
 
-Nenhum dado bruto (PNAD ou ESEB) deve ser versionado — apenas o código de
-processamento. `pipeline/raw/` e `pipeline/out/` contêm apenas `.gitkeep`.
+Microdados brutos (PNAD ou ESEB) ficam fora do git — `pipeline/raw/` contém
+apenas `.gitkeep`. Em contraste, os JSONs derivados (`core.json`, `bonus.json`) em
+`pipeline/out/` **são commitados no git por design**, pois são o resultado
+processado e reproductível que o site consome.

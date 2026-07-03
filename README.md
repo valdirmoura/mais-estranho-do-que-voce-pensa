@@ -34,7 +34,7 @@ Think"](https://www.atvbt.com/youre-weirder-than-you-think), de Uri
 ├── pipeline/          # Pipeline Python: baixa e processa os microdados
 │   ├── src/quizbr/    #   baixar.py, leitor.py, recode.py, agregar.py, bonus.py, sanidade.py
 │   ├── raw/           #   dados brutos baixados (fora do git, .gitkeep only)
-│   ├── out/           #   core.json / bonus.json gerados (fora do git)
+│   ├── out/           #   core.json / bonus.json gerados (commitados no git)
 │   └── tests/
 ├── site/               # Astro 7 + React 19 + Tailwind 4
 │   ├── src/pages/index.astro     # artigo + ilha do quiz
@@ -51,9 +51,9 @@ Think"](https://www.atvbt.com/youre-weirder-than-you-think), de Uri
 Pré-requisitos: Python 3.11+, dependências em `pipeline/pyproject.toml` (pandas, pyreadstat etc).
 
 ```bash
-cd pipeline
-python -m venv .venv && .venv/Scripts/activate   # ou source .venv/bin/activate no Linux/Mac
-pip install -e .
+python -m venv .venv && .venv\Scripts\activate   # ou source .venv/bin/activate no Linux/Mac
+.venv\Scripts\pip install -r pipeline\requirements.txt
+.venv\Scripts\pip install -e pipeline
 ```
 
 ### 1. Núcleo (PNAD Contínua)
