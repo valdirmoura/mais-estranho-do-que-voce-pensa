@@ -1,4 +1,5 @@
-import type { Resultado as R, CoreMeta } from "../lib/tipos";
+import type { Resultado as R, CoreMeta, Core } from "../lib/tipos";
+import Bonus from "./Bonus";
 
 const COMPARACOES: [number, string][] = [
   [1_000, "menos gente que um show de bairro"],
@@ -12,8 +13,9 @@ function comparar(pessoas: number): string {
   return "ainda assim, uma fatia minúscula do Brasil";
 }
 
-export default function Resultado({ r, meta, urlShare, aoRefazer }:
-  { r: R; meta: CoreMeta; urlShare: string; aoRefazer: () => void }) {
+export default function Resultado({ r, meta, urlShare, core, indices, contagem, aoRefazer }:
+  { r: R; meta: CoreMeta; urlShare: string; core: Core; indices: number[];
+    contagem: number | null; aoRefazer: () => void }) {
   const compartilhar = async () => {
     const dados = { title: "Você é mais estranho do que pensa",
       text: "Descobri quão raro é meu perfil no Brasil. E o seu?", url: urlShare };
@@ -63,6 +65,14 @@ export default function Resultado({ r, meta, urlShare, aoRefazer }:
         <button onClick={aoRefazer} className="rounded-xl border px-6 py-3">
           Refazer
         </button>
+      </div>
+      {contagem !== null && (
+        <p className="text-sm text-neutral-500">
+          {contagem.toLocaleString("pt-BR")} pessoas já fizeram o quiz
+        </p>
+      )}
+      <div className="pt-4">
+        <Bonus core={core} indices={indices} />
       </div>
     </div>
   );

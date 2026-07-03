@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@vercel/node": "^5.8.22",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   }
