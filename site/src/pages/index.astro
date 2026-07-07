@@ -67,69 +67,104 @@ const url = "https://voce-e-estranho.vercel.app/";
 
     <Quiz client:load />
 
-    <section class="mt-12 max-w-none space-y-4 border-t border-tinta/20 pt-8 leading-relaxed text-tinta/80">
-      <h2 class="text-2xl font-bold text-tinta">Metodologia</h2>
-      <p>
-        O núcleo do quiz — as oito primeiras perguntas — vem de uma única
-        fonte: a <strong>PNAD Contínua 2025, visita 1</strong> (Pesquisa
-        Nacional por Amostra de Domicílios Contínua, IBGE). São 308.384
-        entrevistados adultos, cujas respostas carregam pesos amostrais que,
-        somados, projetam a população real: cerca de 161,2 milhões de
-        adultos no Brasil.
-      </p>
-      <p>
-        A cada uma das suas respostas — sexo, idade, região, cor/raça,
-        escolaridade, renda domiciliar per capita, situação de trabalho e
-        acesso à internet no domicílio — o quiz cruza as oito dimensões e
-        localiza a célula correspondente entre as 75 mil combinações possíveis
-        (20.742 delas aparecem na amostra). O número que aparece na tela é a soma dos pesos amostrais
-        de todo mundo, na pesquisa, que caiu exatamente nessa célula.
-      </p>
-      <p>
-        Um ponto importante: isso <strong>não é</strong> multiplicar oito
-        probabilidades independentes entre si. Se fizéssemos isso,
-        estaríamos assumindo que escolaridade, renda, região e as demais
-        características não têm relação umas com as outras — o que é falso.
-        Escolaridade e renda caminham juntas; região e cor/raça também.
-        Multiplicar probabilidades marginais ignora essas correlações reais
-        e produz números fantasiosos, tanto para mais quanto para menos. Por
-        isso o quiz faz <strong>contagem direta</strong> na amostra
-        ponderada: cada combinação é observada (ou não) nos dados reais, e é
-        exatamente por causa das correlações do mundo real que uma
-        combinação pode ser muito mais comum — ou muito mais rara — do que a
-        conta "ingênua" sugeriria.
-      </p>
-      <p>
-        Com 75 mil células possíveis e "apenas" 308 mil entrevistados, é
-        normal que combinações raras não apareçam nenhuma vez na amostra.
-        Quando isso acontece, o quiz nunca diz "0 pessoas" — isso seria uma
-        afirmação que os dados não sustentam. Em vez disso, ele mostra um
-        piso honesto: <em>"menos de 1 em 308.384"</em>, o tamanho da própria
-        amostra. É a forma mais correta de dizer "não observamos essa
-        combinação, mas isso não prova que ela não exista".
-      </p>
-      <p>
-        O bônus opcional — religião e posicionamento político — não está na
-        PNAD, então usamos uma segunda fonte: o{" "}
-        <strong>ESEB 2022</strong> (Estudo Eleitoral Brasileiro,
-        CESOP/UNICAMP). Como essa amostra é bem menor, a estimativa é
-        calculada de forma condicional ao seu perfil demográfico (região,
-        sexo, idade, escolaridade), recuando para grupos mais amplos quando
-        necessário. É uma aproximação honesta, não uma contagem exata — por
-        isso o bônus aparece separado do resultado principal, com esse
-        aviso explícito.
-      </p>
-      <p>
-        Sobre privacidade: o cálculo roda inteiramente no seu navegador. Suas
-        respostas nunca são enviadas a nenhum servidor. O único dado que sai
-        do seu aparelho é um contador anônimo de "quiz concluído", sem
-        nenhuma informação sobre quais foram suas respostas.
-      </p>
-      <p>
-        Código-fonte, pipeline de dados e detalhes técnicos estão no
-        repositório do projeto.
-      </p>
-      <h2 class="text-2xl font-bold text-tinta">Crédito</h2>
+    <section class="mt-12 max-w-none border-t border-tinta/20 pt-8">
+      <h2 class="mb-4 text-2xl font-bold text-tinta">Metodologia</h2>
+      <div class="space-y-2 leading-relaxed text-tinta/80">
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            De onde vêm os dados?
+          </summary>
+          <p class="mt-3">
+            De uma única fonte: a <strong>PNAD Contínua 2025, visita 1</strong>
+            (Pesquisa Nacional por Amostra de Domicílios Contínua, IBGE). São
+            308.384 entrevistados adultos, cujas respostas carregam pesos
+            amostrais que, somados, projetam a população real: cerca de 161,2
+            milhões de adultos no Brasil.
+          </p>
+        </details>
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            Como o número é calculado?
+          </summary>
+          <p class="mt-3">
+            A cada uma das suas respostas — sexo, idade, região, cor/raça,
+            escolaridade, renda domiciliar per capita, situação de trabalho e
+            acesso à internet no domicílio — o quiz cruza as oito dimensões e
+            localiza a célula correspondente entre as 75 mil combinações
+            possíveis (20.742 delas aparecem na amostra). O número que aparece
+            na tela é a soma dos pesos amostrais de todo mundo, na pesquisa,
+            que caiu exatamente nessa célula.
+          </p>
+        </details>
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            Por que não multiplicar probabilidades?
+          </summary>
+          <p class="mt-3">
+            Multiplicar oito probabilidades independentes assumiria que
+            escolaridade, renda, região e as demais características não têm
+            relação umas com as outras — o que é falso. Escolaridade e renda
+            caminham juntas; região e cor/raça também. Multiplicar
+            probabilidades marginais ignora essas correlações reais e produz
+            números fantasiosos, tanto para mais quanto para menos. Por isso o
+            quiz faz <strong>contagem direta</strong> na amostra ponderada:
+            cada combinação é observada (ou não) nos dados reais, e é
+            exatamente por causa das correlações do mundo real que uma
+            combinação pode ser muito mais comum — ou muito mais rara — do que
+            a conta "ingênua" sugeriria.
+          </p>
+        </details>
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            E quando a combinação não aparece na amostra?
+          </summary>
+          <p class="mt-3">
+            Com 75 mil células possíveis e "apenas" 308 mil entrevistados, é
+            normal que combinações raras não apareçam nenhuma vez. Quando isso
+            acontece, o quiz nunca diz "0 pessoas" — isso seria uma afirmação
+            que os dados não sustentam. Em vez disso, ele mostra um piso
+            honesto: <em>"menos de 1 em 308.384"</em>, o tamanho da própria
+            amostra. É a forma mais correta de dizer "não observamos essa
+            combinação, mas isso não prova que ela não exista".
+          </p>
+        </details>
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            Como funciona o bônus de religião e política?
+          </summary>
+          <p class="mt-3">
+            Religião e posicionamento político não estão na PNAD, então usamos
+            uma segunda fonte: o <strong>ESEB 2022</strong> (Estudo Eleitoral
+            Brasileiro, CESOP/UNICAMP). Como essa amostra é bem menor, a
+            estimativa é calculada de forma condicional ao seu perfil
+            demográfico (região, sexo, idade, escolaridade), recuando para
+            grupos mais amplos quando necessário. É uma aproximação honesta,
+            não uma contagem exata — por isso o bônus aparece separado do
+            resultado principal, com esse aviso explícito.
+          </p>
+        </details>
+        <details class="rounded-lg border border-tinta/20 p-4">
+          <summary class="cursor-pointer font-semibold text-tinta">
+            O que acontece com as minhas respostas?
+          </summary>
+          <p class="mt-3">
+            Nada sai do seu aparelho: o cálculo roda inteiramente no seu
+            navegador e suas respostas nunca são enviadas a nenhum servidor. O
+            único dado transmitido é um contador anônimo de "quiz concluído",
+            sem nenhuma informação sobre quais foram suas respostas.
+            Código-fonte, pipeline de dados e detalhes técnicos estão no{" "}
+            <a
+              href="https://github.com/valdirmoura/mais-estranho-do-que-voce-pensa"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-destaque underline"
+            >repositório do projeto</a>.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <footer class="mt-12 border-t border-tinta/20 pt-6 text-sm text-tinta/70">
       <p>
         A ideia original deste quiz é do Uri, do site atvbt.com:{" "}
         <a
@@ -137,11 +172,24 @@ const url = "https://voce-e-estranho.vercel.app/";
           target="_blank"
           rel="noopener noreferrer"
           class="text-destaque underline"
-        >
-          "You're Weirder Than You Think"
-        </a>. Esta é uma adaptação para dados brasileiros, com fonte, metodologia
-        e piso estatístico próprios.
+        >"You're Weirder Than You Think"</a>. Esta é uma adaptação para dados
+        brasileiros, com fonte, metodologia e piso estatístico próprios.
       </p>
-    </section>
+      <p class="mt-4 flex flex-wrap items-center gap-x-2 border-t border-tinta/10 pt-4">
+        <span class="font-semibold text-tinta">Você é mais estranho do que pensa</span>
+        <span>·</span>
+        <span>© 2026</span>
+        <span>·</span>
+        <span>
+          feito por{" "}
+          <a
+            href="https://anmaru.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-semibold text-tinta underline"
+          >anmarū</a>
+        </span>
+      </p>
+    </footer>
   </body>
 </html>
