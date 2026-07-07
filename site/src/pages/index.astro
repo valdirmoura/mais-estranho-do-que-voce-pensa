@@ -1,5 +1,9 @@
 ---
 import '../styles/global.css';
+import '@fontsource/work-sans/400.css';
+import '@fontsource/work-sans/600.css';
+import '@fontsource/work-sans/700.css';
+import '@fontsource/work-sans/800.css';
 import Quiz from "../components/Quiz";
 
 const titulo = "Você é mais estranho do que pensa";
@@ -25,14 +29,15 @@ const url = "https://site-kappa-one-5q7jzjfra0.vercel.app/";
     <meta name="twitter:description" content={descricao} />
 
     <link rel="icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#F7F6E5" />
 
     <!-- Vercel Web Analytics (só coleta após ativar no dashboard; sem cookies) -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script is:inline defer src="/_vercel/insights/script.js"></script>
   </head>
-  <body class="mx-auto max-w-2xl p-6 font-sans">
-    <h1 class="mb-4 text-4xl font-black">{titulo}</h1>
+  <body class="mx-auto max-w-2xl bg-fundo p-6 font-sans text-tinta">
+    <h1 class="mb-4 text-4xl font-extrabold text-tinta">{titulo}</h1>
 
-    <section class="prose prose-neutral mb-10 max-w-none text-neutral-700">
+    <section class="mb-10 max-w-none space-y-4 leading-relaxed text-tinta/80">
       <p>
         Pense no brasileiro médio. Agora responda: você é ele? Quase
         certamente não. "Brasileiro médio" é uma ficção estatística — uma
@@ -62,8 +67,8 @@ const url = "https://site-kappa-one-5q7jzjfra0.vercel.app/";
 
     <Quiz client:load />
 
-    <section class="prose prose-neutral mt-12 max-w-none border-t pt-8 text-neutral-700">
-      <h2 class="text-2xl font-bold text-neutral-900">Metodologia</h2>
+    <section class="mt-12 max-w-none space-y-4 border-t border-tinta/20 pt-8 leading-relaxed text-tinta/80">
+      <h2 class="text-2xl font-bold text-tinta">Metodologia</h2>
       <p>
         O núcleo do quiz — as oito primeiras perguntas — vem de uma única
         fonte: a <strong>PNAD Contínua 2025, visita 1</strong> (Pesquisa
@@ -124,14 +129,14 @@ const url = "https://site-kappa-one-5q7jzjfra0.vercel.app/";
         Código-fonte, pipeline de dados e detalhes técnicos estão no
         repositório do projeto.
       </p>
-      <h2 class="text-2xl font-bold text-neutral-900">Crédito</h2>
+      <h2 class="text-2xl font-bold text-tinta">Crédito</h2>
       <p>
         A ideia original deste quiz é do Uri, do site atvbt.com:{" "}
         <a
           href="https://www.atvbt.com/youre-weirder-than-you-think"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-emerald-700 underline"
+          class="text-destaque underline"
         >
           "You're Weirder Than You Think"
         </a>. Esta é uma adaptação para dados brasileiros, com fonte, metodologia

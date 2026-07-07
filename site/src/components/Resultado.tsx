@@ -27,14 +27,14 @@ export default function Resultado({ r, meta, urlShare, core, indices, contagem, 
       {r.tipo === "exato" ? (
         <>
           <p className="text-lg">Sua combinação exata aparece em</p>
-          <p className="text-6xl font-black text-emerald-700">
+          <p className="text-6xl font-extrabold text-destaque">
             1 em {r.umEmX.toLocaleString("pt-BR")}
           </p>
           <p className="text-lg">
             brasileiros adultos — cerca de {r.pessoas.toLocaleString("pt-BR")} pessoas.
-            <br /><span className="text-neutral-500">({comparar(r.pessoas)})</span>
+            <br /><span className="text-tinta/60">({comparar(r.pessoas)})</span>
           </p>
-          <details className="text-sm text-neutral-500">
+          <details className="text-sm text-tinta/60">
             <summary>Como esse número foi calculado?</summary>
             <p className="mt-2 text-left">
               Fonte: {meta.fonte}, amostra de {meta.total_n.toLocaleString("pt-BR")}{" "}
@@ -48,7 +48,7 @@ export default function Resultado({ r, meta, urlShare, core, indices, contagem, 
       ) : (
         <>
           <p className="text-lg">Sua combinação é tão rara que</p>
-          <p className="text-4xl font-black text-emerald-700">
+          <p className="text-4xl font-extrabold text-destaque">
             não apareceu nem uma vez
           </p>
           <p className="text-lg">
@@ -59,15 +59,16 @@ export default function Resultado({ r, meta, urlShare, core, indices, contagem, 
       )}
       <div className="flex justify-center gap-3">
         <button onClick={compartilhar}
-          className="rounded-xl bg-emerald-700 px-6 py-3 font-bold text-white">
+          className="min-h-11 rounded-lg bg-tinta px-6 py-3 font-bold text-fundo">
           Compartilhar meu resultado
         </button>
-        <button onClick={aoRefazer} className="rounded-xl border px-6 py-3">
+        <button onClick={aoRefazer}
+          className="min-h-11 rounded-lg border border-tinta/40 px-6 py-3">
           Refazer
         </button>
       </div>
       {contagem !== null && (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-tinta/60">
           {contagem.toLocaleString("pt-BR")} pessoas já fizeram o quiz
         </p>
       )}

@@ -20,13 +20,13 @@ const TITULOS: Record<string, string> = {
 export default function Pergunta({ titulo, opcoes, onResponder, numero, total }: Props) {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-neutral-500">Pergunta {numero} de {total}</p>
-      <h2 className="text-2xl font-bold">{TITULOS[titulo] ?? titulo}</h2>
+      <p className="text-sm text-tinta/60">Pergunta {numero} de {total}</p>
+      <h2 className="text-2xl font-bold text-tinta">{TITULOS[titulo] ?? titulo}</h2>
       <div className="grid gap-2">
         {opcoes.map((o, i) => (
           <button key={i} onClick={() => onResponder(i)}
-            className="rounded-xl border border-neutral-300 px-4 py-3 text-left
-                       hover:border-emerald-600 hover:bg-emerald-50 transition">
+            className="min-h-11 rounded-lg border border-tinta/25 px-4 py-3 text-left
+                       hover:border-realce hover:bg-realce/20 transition">
             {o}
           </button>
         ))}

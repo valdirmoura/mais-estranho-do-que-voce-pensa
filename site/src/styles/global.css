@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+/* Tokens do projeto (paleta local "voce-estranho" sobre o padrão Anmaru).
+   Semânticos: componentes usam estes nomes, nunca hex solto. */
+@theme {
+  --font-sans: "Work Sans", system-ui, sans-serif;
+
+  /* paleta local */
+  --color-fundo: #f7f6e5; /* creme — fundo de página */
+  --color-tinta: #36064d; /* roxo — texto, títulos, ação primária */
+  --color-destaque: #da4848; /* vermelho — número-resultado, ênfase (só texto grande) */
+  --color-realce: #76d2db; /* teal — hover, foco, apoios */
+}
+
+/* Foco visível (WCAG 2.2) — anel teal em qualquer controle */
+:focus-visible {
+  outline: 3px solid rgba(118, 210, 219, 0.75);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

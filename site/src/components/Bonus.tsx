@@ -29,7 +29,8 @@ export default function Bonus({ core, indices }:
 
   if (!aberto) {
     return (
-      <button onClick={abrir} className="rounded-xl border px-6 py-3">
+      <button onClick={abrir}
+        className="min-h-11 rounded-lg border border-tinta/40 px-6 py-3 hover:border-realce hover:bg-realce/20 transition">
         Bônus: e se contarmos religião e política?
       </button>
     );
@@ -60,7 +61,7 @@ export default function Bonus({ core, indices }:
           {r.limiteUmEm.toLocaleString("pt-BR")}.
         </p>
       )}
-      <details className="text-sm text-neutral-500 text-left">
+      <details className="text-sm text-tinta/60 text-left">
         <summary>Por que este número é uma estimativa?</summary>
         <p className="mt-2">{DISCLAIMER}</p>
       </details>
@@ -72,11 +73,12 @@ function Escolha({ titulo, opcoes, onEscolher }:
   { titulo: string; opcoes: string[]; onEscolher: (i: number) => void }) {
   return (
     <div className="space-y-3">
-      <h3 className="text-xl font-bold">{titulo}</h3>
+      <h3 className="text-xl font-bold text-tinta">{titulo}</h3>
       <div className="grid gap-2">
         {opcoes.map((o, i) => (
           <button key={i} onClick={() => onEscolher(i)}
-            className="rounded-xl border px-4 py-3 text-left hover:bg-emerald-50">
+            className="min-h-11 rounded-lg border border-tinta/25 px-4 py-3 text-left
+                       hover:border-realce hover:bg-realce/20 transition">
             {o}
           </button>
         ))}
