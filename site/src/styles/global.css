@@ -10,6 +10,7 @@
   --color-tinta: #36064d; /* roxo — texto, títulos, ação primária */
   --color-destaque: #da4848; /* vermelho — número-resultado, ênfase (só texto grande) */
   --color-realce: #76d2db; /* teal — hover, foco, apoios */
+  --color-superficie: #ffffff; /* card do quiz e superfícies elevadas */
 }
 
 /* Foco visível (WCAG 2.2) — anel teal em qualquer controle */
