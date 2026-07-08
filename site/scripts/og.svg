@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#F7F6E5"/>
+  <rect x="0" y="0" width="1200" height="12" fill="#36064D"/>
+
+  <!-- grade de pontos: multidão roxa, um outlier vermelho -->
+  <g transform="translate(760, 150)">
+    <g fill="#36064D" opacity="0.85">
+      <circle cx="0"   cy="0"   r="16"/><circle cx="80"  cy="0"   r="16"/><circle cx="160" cy="0" r="16"/><circle cx="240" cy="0" r="16"/><circle cx="320" cy="0" r="16"/>
+      <circle cx="0"   cy="80"  r="16"/><circle cx="80"  cy="80"  r="16"/><circle cx="160" cy="80" r="16"/><circle cx="240" cy="80" r="16"/><circle cx="320" cy="80" r="16"/>
+      <circle cx="0"   cy="160" r="16"/><circle cx="80"  cy="160" r="16"/>                                   <circle cx="240" cy="160" r="16"/><circle cx="320" cy="160" r="16"/>
+      <circle cx="0"   cy="240" r="16"/><circle cx="80"  cy="240" r="16"/><circle cx="160" cy="240" r="16"/><circle cx="240" cy="240" r="16"/><circle cx="320" cy="240" r="16"/>
+      <circle cx="0"   cy="320" r="16"/><circle cx="80"  cy="320" r="16"/><circle cx="160" cy="320" r="16"/><circle cx="240" cy="320" r="16"/><circle cx="320" cy="320" r="16"/>
+    </g>
+    <circle cx="160" cy="160" r="26" fill="#DA4848"/>
+  </g>
+
+  <!-- texto -->
+  <text x="80" y="250" font-family="Arial, sans-serif" font-size="66" font-weight="800" fill="#36064D">Você é mais</text>
+  <text x="80" y="330" font-family="Arial, sans-serif" font-size="66" font-weight="800" fill="#36064D">estranho do</text>
+  <text x="80" y="410" font-family="Arial, sans-serif" font-size="66" font-weight="800" fill="#36064D">que pensa</text>
+
+  <text x="82" y="470" font-family="Arial, sans-serif" font-size="27" font-weight="400" fill="#DA4848">Quantos brasileiros têm o seu perfil exato?</text>
+
+  <text x="80" y="580" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#36064D">voce-e-estranho.vercel.app</text>
+  <text x="1120" y="580" text-anchor="end" font-family="Arial, sans-serif" font-size="24" font-weight="400" fill="#36064D" opacity="0.6">dados reais do IBGE · feito por anmarū</text>
+</svg>

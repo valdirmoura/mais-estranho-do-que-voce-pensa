@@ -23,12 +23,18 @@ const url = "https://voce-e-estranho.vercel.app/";
     <meta property="og:description" content={descricao} />
     <meta property="og:url" content={url} />
     <meta property="og:locale" content="pt_BR" />
+    <meta property="og:image" content={`${url}og.png`} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Você é mais estranho do que pensa — quantos brasileiros têm o seu perfil exato?" />
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={titulo} />
     <meta name="twitter:description" content={descricao} />
+    <meta name="twitter:image" content={`${url}og.png`} />
 
-    <link rel="icon" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F7F6E5" />
 
     <!-- Vercel Web Analytics (só coleta após ativar no dashboard; sem cookies) -->
