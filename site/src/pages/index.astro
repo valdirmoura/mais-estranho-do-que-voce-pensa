@@ -9,7 +9,7 @@ import Quiz from "../components/Quiz";
 const titulo = "Você é mais estranho do que pensa";
 const descricao =
   "Combine sexo, idade, região, raça, escolaridade, renda, trabalho e internet e descubra quantos brasileiros adultos compartilham exatamente o seu perfil — com dados reais do IBGE (PNAD Contínua 2025).";
-const url = "https://voce-e-estranho.vercel.app/";
+const url = "https://voceestranho.anmaru.com/";
 ---
 <html lang="pt-BR">
   <head>
@@ -17,6 +17,7 @@ const url = "https://voce-e-estranho.vercel.app/";
     <meta name="viewport" content="width=device-width" />
     <title>{titulo}</title>
     <meta name="description" content={descricao} />
+    <link rel="canonical" href={url} />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={titulo} />
