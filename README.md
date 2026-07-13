@@ -27,10 +27,13 @@ Think"](https://www.atvbt.com/youre-weirder-than-you-think), de Uri
   enviada a um servidor. O único dado que sai do aparelho é um contador
   anônimo de "quiz concluído" (sem payload de respostas).
 
+Hospedado na VPS Oracle da Anmaru: https://voceestranho.anmaru.com/
+
 ## Estrutura do repositório
 
 ```
 .
+├── infra/vps/         # Deploy na VPS Oracle (compose.yml, .env.example, README.md)
 ├── pipeline/          # Pipeline Python: baixa e processa os microdados
 │   ├── src/quizbr/    #   baixar.py, leitor.py, recode.py, agregar.py, bonus.py, sanidade.py
 │   ├── raw/           #   dados brutos baixados (fora do git, .gitkeep only)
@@ -40,7 +43,8 @@ Think"](https://www.atvbt.com/youre-weirder-than-you-think), de Uri
 │   ├── src/pages/index.astro     # artigo + ilha do quiz
 │   ├── src/components/           # Quiz, Pergunta, Resultado, Bonus
 │   ├── src/lib/                  # lookup, share, tipos
-│   ├── api/contador.ts           # serverless function (contador anônimo, Upstash)
+│   ├── server/                   # servidor Node (estáticos + /api/contador, Redis)
+│   ├── Dockerfile                # imagem usada pelo infra/vps/compose.yml
 │   ├── scripts/copiar-dados.mjs  # copia pipeline/out/*.json -> site/public/data/
 │   └── public/data/              # core.json (e bonus.json, se gerado) servidos estaticamente
 └── docs/, .superpowers/          # specs, planos e histórico de execução do projeto
@@ -105,32 +109,27 @@ npm run dev        # http://localhost:4321
 Outros comandos: `npm run build` (build estático em `site/dist/`), `npm run
 preview` (serve o build), `npm test` (vitest).
 
-## Deploy (Vercel)
+## Deploy (VPS Oracle)
 
-O diretório raiz do projeto Vercel é `site/`. Build estático (Astro) +
-`site/api/contador.ts` como serverless function (detectado automaticamente).
+O quiz roda inteiramente na VPS Oracle da Anmaru (`147.15.78.16`), como
+dois containers Docker: `quiz-app` (Node — estáticos + `/api/contador`) e
+`quiz-redis` (contador de conclusões, self-hosted). Instruções completas
+em [`infra/vps/README.md`](infra/vps/README.md).
+
+Resumo:
 
 ```bash
-cd site
-npx vercel --yes     # primeira vez: cria o projeto
-npx vercel --prod     # deploy de produção
+ssh ubuntu@147.15.78.16
+cd ~/voceestranho && git pull
+cd infra/vps && docker compose --env-file .env -f compose.yml up -d --build
 ```
 
-Depois do primeiro deploy:
-
-- **Vercel Analytics:** ative no dashboard do projeto (Analytics tab).
-- **Contador de conclusões:** crie um banco Upstash Redis pelo marketplace
-  de integrações da Vercel, defina as env vars `UPSTASH_REDIS_REST_URL` e
-  `UPSTASH_REDIS_REST_TOKEN` no projeto e faça redeploy. Sem essas env
-  vars, `/api/contador` responde `{ "count": null }` e o site funciona
-  normalmente sem exibir o contador.
+O domínio `voceestranho.anmaru.com` aponta (registro A) direto para a
+VPS; o Caddy central (`vps-gateway`) faz o proxy reverso e emite o
+certificado HTTPS automaticamente.
 
 ## Pendências (para o usuário)
 
 - [ ] Baixar `eseb2022.sav` do CESOP e rodar `python -m quizbr.bonus`, depois
-      `npm run dados` (dentro de `site/`) e redeploy, para ativar o bônus de
-      religião/política em produção.
-- [ ] Criar um banco Upstash Redis no marketplace da Vercel e configurar
-      `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` nas env vars do
-      projeto, depois redeploy, para ativar o contador de conclusões.
-- [ ] Ativar o Vercel Analytics no dashboard do projeto.
+      `npm run dados` (dentro de `site/`), `git push` e um novo deploy na
+      VPS, para ativar o bônus de religião/política em produção.
