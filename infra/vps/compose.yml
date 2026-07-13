@@ -1,0 +1,42 @@
+name: voceestranho
+
+services:
+  quiz-redis:
+    image: redis:7-alpine
+    container_name: quiz-redis
+    restart: unless-stopped
+    volumes:
+      - quiz_redis_data:/data
+    networks:
+      - quiz_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  quiz-app:
+    build:
+      context: ../../site
+      dockerfile: Dockerfile
+    container_name: quiz-app
+    restart: unless-stopped
+    depends_on:
+      quiz-redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      PORT: ${PORT}
+    networks:
+      - vps_public
+      - quiz_internal
+
+networks:
+  vps_public:
+    external: true
+    name: vps_public
+  quiz_internal:
+    internal: true
+
+volumes:
+  quiz_redis_data:
