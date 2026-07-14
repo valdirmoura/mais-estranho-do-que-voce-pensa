@@ -17,6 +17,7 @@ export default function Resultado({ r, meta, urlShare, core, indices, contagem, 
   { r: R; meta: CoreMeta; urlShare: string; core: Core; indices: number[];
     contagem: number | null; aoRefazer: () => void }) {
   const compartilhar = async () => {
+    navigator.sendBeacon("/api/evento/share");
     const dados = { title: "Você é mais estranho do que pensa",
       text: "Descobri quão raro é meu perfil no Brasil. E o seu?", url: urlShare };
     if (navigator.share) await navigator.share(dados);

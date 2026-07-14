@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import handler from "serve-handler";
 import { createClient } from "redis";
 import { lerOuIncrementar } from "./contador.mjs";
+import { registrarEvento, lerEstatisticas } from "./eventos.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.join(__dirname, "..", "dist");
@@ -26,11 +27,21 @@ async function criarClienteRedis() {
 const clienteRedis = await criarClienteRedis();
 
 const servidor = http.createServer(async (req, res) => {
-  if (req.url === "/api/contador") {
-    const resultado = await lerOuIncrementar(clienteRedis, req.method);
+  const responderJson = (obj) => {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(resultado));
-    return;
+    res.end(JSON.stringify(obj));
+  };
+  if (req.url === "/api/contador") {
+    return responderJson(await lerOuIncrementar(clienteRedis, req.method));
+  }
+  if (req.method === "POST" && req.url === "/api/evento/visita") {
+    return responderJson(await registrarEvento(clienteRedis, "visita"));
+  }
+  if (req.method === "POST" && req.url === "/api/evento/share") {
+    return responderJson(await registrarEvento(clienteRedis, "share"));
+  }
+  if (req.method === "GET" && req.url === "/api/estatisticas") {
+    return responderJson(await lerEstatisticas(clienteRedis));
   }
   await handler(req, res, { public: DIST_DIR });
 });

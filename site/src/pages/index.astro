@@ -200,5 +200,11 @@ const url = "https://voceestranho.anmaru.com/";
         </span>
       </p>
     </footer>
+    <script>
+      if (!sessionStorage.getItem("quiz-visita")) {
+        navigator.sendBeacon("/api/evento/visita");
+        sessionStorage.setItem("quiz-visita", "1");
+      }
+    </script>
   </body>
 </html>
