@@ -12,36 +12,47 @@ from quizbr import config
 RELIGIOES = ["Católica", "Evangélica", "Outras religiões", "Sem religião"]
 POLITICAS = ["Esquerda", "Centro", "Direita", "Não se posiciona"]
 
-# CONFIRMAR nomes no codebook do ESEB 2022 (CESOP). A validação abaixo
-# falha ruidosamente listando colunas candidatas se algum nome estiver errado.
+# Nomes confirmados contra o codebook ESEB 2022 (tabela de frequências
+# CESOP/QUAEST 04810, pipeline/raw/TF_04810.pdf): UF p.2 (código IBGE de 2
+# dígitos), D02 p.6, D01A_IDADE p.7-11 (anos completos), D03 p.12, Q19
+# (autoposicionamento 0-10) e D10 p.168. A validação abaixo falha
+# ruidosamente listando colunas candidatas se algum nome não bater no .sav.
 MAPA_ESEB = {"religiao": "D10", "escala_lr": "Q19",
-             "uf": "UF", "sexo": "D2_SEXO", "idade": "D1A_IDADE",
-             "escolaridade": "D3_ESCOLA"}
+             "uf": "UF", "sexo": "D02", "idade": "D01A_IDADE",
+             "escolaridade": "D03"}
 
-# Mapeamento código de resposta (religiao, no .sav) -> índice em RELIGIOES.
-# CONFIRMAR contra o codebook real do ESEB 2022 antes do run oficial — os
-# códigos abaixo são um placeholder plausível (categoria CESOP típica de
-# perguntas de religião) e devem ser ajustados após inspecionar
-# pyreadstat.read_sav(..., apply_value_formats=False) + meta.variable_value_labels.
+# D10 -> índice em RELIGIOES. Códigos confirmados no TF_04810.pdf p.168.
+# Código 7 (Mórmon/Adventista/Testemunha de Jeová) vai para Evangélica
+# porque a Adventista domina a categoria no Brasil e o Censo IBGE a
+# classifica como evangélica de missão; 100 (acredita em Deus, sem
+# religião declarada) segue o critério do Censo para "sem religião".
 MAPA_RELIGIAO = {
-    1: 0,   # católica -> Católica
-    2: 1, 3: 1, 4: 1, 5: 1,  # evangélica (todas as denominações) -> Evangélica
-    6: 2, 7: 2, 8: 2, 9: 2,  # espírita, umbanda/candomblé, judaica, outras -> Outras religiões
-    10: 3, 11: 3,            # sem religião, ateu/agnóstico -> Sem religião
-    # NS/NR (ex.: 97, 98, 99) não mapeados aqui de propósito -> .get() retorna
+    3: 0,                     # Católica
+    5: 1, 7: 1,               # Evangélica; Mórmon/Adventista/TJ
+    1: 2,                     # Budista
+    2: 2, 10: 2,              # Candomblé, Umbanda
+    4: 2,                     # Espírita Kardecista/Espiritualista
+    6: 2,                     # Judaica
+    9: 2,                     # Seicho-No-Ie/Messiânica/Perfeita Liberdade
+    101: 2, 102: 2,           # Pagão; "Cristão" genérico (sem denominação)
+    96: 3, 97: 3, 100: 3,     # Ateu/agnóstico; Não tem religião; Acredita em Deus
+    # 98 (Não respondeu) e 99 (Não sabe) fora de propósito -> .get() retorna
     # None e o respondente é descartado (ver recodificar_religiao).
 }
 
-# Mapeamento código de resposta (escolaridade, no .sav) -> índice em escol5.
-# CONFIRMAR contra o codebook real do ESEB 2022 antes do run oficial — os
-# códigos abaixo são um placeholder plausível e devem ser ajustados após inspecionar
-# pyreadstat.read_sav(..., apply_value_formats=False) + meta.variable_value_labels.
+# D03 -> índice em escol5 (mesmos 5 níveis do núcleo PNADC, ver recode.py).
+# Códigos confirmados no TF_04810.pdf p.12: 1 analfabeto, 2 primário
+# incompleto, 3 primário completo, 4 ginásio incompleto, 5 ginásio completo,
+# 6 colegial incompleto, 7 colegial completo, 8 universitário incompleto/
+# técnico, 9 universitário completo, 10 pós-graduação.
 MAPA_ESCOLARIDADE = {
-    1: 0,   # escolaridade mínima -> 0
-    2: 0, 3: 1,  # placeholder para códigos intermediários -> 0 ou 1
-    4: 1, 5: 2, 6: 3, 7: 4,  # escolaridade crescente -> 1 a 4
-    # NS/NR (ex.: 97, 98, 99) não mapeados aqui de propósito -> .get() retorna
-    # None e o respondente é descartado (ver recodificar_escolaridade).
+    1: 0, 2: 0, 3: 0, 4: 0,  # até fundamental incompleto
+    5: 1, 6: 1,              # fundamental completo / médio incompleto
+    7: 2,                    # médio completo
+    8: 3,                    # superior incompleto (ou técnico pós-médio)
+    9: 4, 10: 4,             # superior completo / pós-graduação
+    # 99 (Não respondeu) fora de propósito -> .get() retorna None e o
+    # respondente é descartado (ver recodificar_escolaridade).
 }
 
 # Substrings usadas para sugerir colunas candidatas quando um nome do
