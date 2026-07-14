@@ -130,6 +130,14 @@ certificado HTTPS automaticamente.
 
 ## Pendências (para o usuário)
 
-- [ ] Baixar `eseb2022.sav` do CESOP e rodar `python -m quizbr.bonus`, depois
-      `npm run dados` (dentro de `site/`), `git push` e um novo deploy na
-      VPS, para ativar o bônus de religião/política em produção.
+- [ ] **ESEB 2022 (bônus religião/política):** aguardando o CESOP/UNICAMP
+      liberar o acesso ao `.sav` (re-solicitado por e-mail em 2026-07-14).
+      Os mapeamentos de `pipeline/src/quizbr/bonus.py` já foram confirmados
+      contra o codebook (`pipeline/raw/TF_04810.pdf`). Quando o arquivo
+      chegar: salvar como `pipeline/raw/eseb2022.sav` →
+      `python -m quizbr.bonus` → conferir margem de religião vs Censo 2022
+      (~57% católica, ~27% evangélica) → `npm run dados` (em `site/`) →
+      push → deploy na VPS.
+- [ ] **Divulgar o link** para amigos e conhecidos — o restante é orgânico.
+      Estatísticas anônimas:
+      `curl https://voceestranho.anmaru.com/api/estatisticas`.
