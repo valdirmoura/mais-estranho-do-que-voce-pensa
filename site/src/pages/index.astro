@@ -38,8 +38,6 @@ const url = "https://voceestranho.anmaru.com/";
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F7F6E5" />
 
-    <!-- Vercel Web Analytics (só coleta após ativar no dashboard; sem cookies) -->
-    <script is:inline defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="mx-auto max-w-2xl bg-fundo p-6 font-sans text-tinta">
     <h1 class="mb-4 text-4xl font-extrabold text-tinta">{titulo}</h1>
@@ -55,16 +53,24 @@ const url = "https://voceestranho.anmaru.com/";
         adultos do Brasil, quantos têm a <em>combinação exata</em> das suas
         oito características?
       </p>
-      <p>
-        Isso importa mais agora do que de costume. Estamos a caminho de
-        2026, ano de eleição presidencial, e cada bolha — de WhatsApp, de
-        timeline, de bairro — tende a achar que representa o país. Não
-        representa. O Brasil é grande, desigual e plural demais para caber
-        na experiência de qualquer grupo, inclusive no seu. Ver o próprio
-        perfil reduzido a um número — "1 em 40 mil", "1 em 2 milhões" — é um
-        jeito rápido de lembrar que a sua realidade é uma entre muitas, não
-        a régua contra a qual as outras deveriam ser medidas.
-      </p>
+      <!-- No mobile, este parágrafo fica recolhido para o quiz aparecer
+           mais cedo; no desktop (sm+) o script abaixo abre o <details> e
+           esconde o <summary>, ficando idêntico a um parágrafo normal. -->
+      <details id="contexto-eleicao">
+        <summary class="cursor-pointer font-semibold text-tinta underline decoration-tinta/40 sm:hidden">
+          Por que isso importa agora?
+        </summary>
+        <p class="mt-4 sm:mt-0">
+          Isso importa mais agora do que de costume. Estamos a caminho de
+          2026, ano de eleição presidencial, e cada bolha — de WhatsApp, de
+          timeline, de bairro — tende a achar que representa o país. Não
+          representa. O Brasil é grande, desigual e plural demais para caber
+          na experiência de qualquer grupo, inclusive no seu. Ver o próprio
+          perfil reduzido a um número — "1 em 40 mil", "1 em 2 milhões" — é um
+          jeito rápido de lembrar que a sua realidade é uma entre muitas, não
+          a régua contra a qual as outras deveriam ser medidas.
+        </p>
+      </details>
       <p>
         Responda às oito perguntas abaixo. No fim, você recebe sua raridade
         estimada e pode comparar com a de quem quiser — inclusive testando
@@ -201,6 +207,9 @@ const url = "https://voceestranho.anmaru.com/";
       </p>
     </footer>
     <script>
+      if (window.matchMedia("(min-width: 640px)").matches) {
+        document.getElementById("contexto-eleicao")?.setAttribute("open", "");
+      }
       if (!sessionStorage.getItem("quiz-visita")) {
         navigator.sendBeacon("/api/evento/visita");
         sessionStorage.setItem("quiz-visita", "1");
