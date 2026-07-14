@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Core, Bonus as BonusDados, Resultado as R } from "../lib/tipos";
 import { buscarBonus } from "../lib/lookup";
 
@@ -12,31 +12,30 @@ não uma contagem exata — por isso o bônus é separado.`;
 export default function Bonus({ core, indices }:
   { core: Core; indices: number[] }) {
   const [dados, setDados] = useState<BonusDados | null>(null);
-  const [erro, setErro] = useState(false);
   const [aberto, setAberto] = useState(false);
   const [rel, setRel] = useState<number | null>(null);
   const [pol, setPol] = useState<number | null>(null);
 
-  const abrir = () => {
-    setAberto(true);
-    if (!dados) {
-      fetch("/data/bonus.json")
-        .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-        .then(setDados)
-        .catch(() => setErro(true));
-    }
-  };
+  // O bônus depende do ESEB 2022 (bonus.json só existe depois do run do
+  // pipeline) — enquanto o arquivo não estiver publicado, a seção inteira
+  // fica oculta em vez de mostrar um convite que termina em erro.
+  useEffect(() => {
+    fetch("/data/bonus.json")
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(setDados)
+      .catch(() => {});
+  }, []);
+
+  if (!dados) return null;
 
   if (!aberto) {
     return (
-      <button onClick={abrir}
+      <button onClick={() => setAberto(true)}
         className="min-h-11 rounded-lg border border-tinta/40 px-6 py-3 hover:border-realce hover:bg-realce/20 transition">
         Bônus: e se contarmos religião e política?
       </button>
     );
   }
-  if (erro) return <p>Não foi possível carregar o bônus.</p>;
-  if (!dados) return <p>Carregando bônus…</p>;
 
   if (rel === null) {
     return <Escolha titulo="Qual sua religião?" opcoes={dados.meta.religiao}
