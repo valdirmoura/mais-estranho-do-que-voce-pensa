@@ -1,10 +1,18 @@
 name: voceestranho
 
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+
 services:
   quiz-redis:
     image: redis:7-alpine
     container_name: quiz-redis
     restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    logging: *logging
     volumes:
       - quiz_redis_data:/data
     networks:
@@ -21,6 +29,7 @@ services:
       dockerfile: Dockerfile
     container_name: quiz-app
     restart: unless-stopped
+    logging: *logging
     depends_on:
       quiz-redis:
         condition: service_healthy
@@ -30,6 +39,12 @@ services:
     networks:
       - vps_public
       - quiz_internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${PORT:-3000}/api/contador >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   vps_public:
