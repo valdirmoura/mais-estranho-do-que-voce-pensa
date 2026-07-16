@@ -1,9 +1,16 @@
-"""Bônus ESEB 2022 -> distribuições condicionais religião×política.
+"""Bônus religião×política -> distribuições condicionais.
 
-Consome pipeline/raw/eseb2022.sav (download manual documentado no README —
-CESOP/UNICAMP) e produz pipeline/out/bonus.json com as distribuições de
-religião × posicionamento político condicionadas em até 4 níveis de recuo
-(regiao|sexo|faixa3|escol3 -> regiao|escol3 -> escol3 -> global)."""
+Fonte: CSES Módulo 6 (Comparative Study of Electoral Systems, Universidade
+de Michigan). O componente brasileiro do Módulo 6 É o ESEB 2022 (mesmo
+estudo, n=2001) — obtido sem cadastro em https://cses.org/data-download/,
+ao contrário do .sav nativo do CESOP. As variáveis são harmonizadas pelo
+CSES (nomes/códigos próprios, não os nativos do ESEB).
+
+Consome pipeline/raw/cses6/cses6.sav (download documentado no README),
+filtra o Brasil (F1004 == "BRA_2022") e produz pipeline/out/bonus.json com
+as distribuições de religião × posicionamento político condicionadas em até
+4 níveis de recuo (regiao|sexo|faixa3|escol3 -> regiao|escol3 -> escol3 ->
+global)."""
 import json
 from collections import Counter, defaultdict
 import pyreadstat
@@ -12,59 +19,52 @@ from quizbr import config
 RELIGIOES = ["Católica", "Evangélica", "Outras religiões", "Sem religião"]
 POLITICAS = ["Esquerda", "Centro", "Direita", "Não se posiciona"]
 
-# Nomes confirmados contra o codebook ESEB 2022 (tabela de frequências
-# CESOP/QUAEST 04810, pipeline/raw/TF_04810.pdf): UF p.2 (código IBGE de 2
-# dígitos), D02 p.6, D01A_IDADE p.7-11 (anos completos), D03 p.12, Q19
-# (autoposicionamento 0-10) e D10 p.168. A validação abaixo falha
-# ruidosamente listando colunas candidatas se algum nome não bater no .sav.
-MAPA_ESEB = {"religiao": "D10", "escala_lr": "Q19",
-             "uf": "UF", "sexo": "D02", "idade": "D01A_IDADE",
-             "escolaridade": "D03"}
+# Identificador do estudo brasileiro no arquivo integrado do CSES.
+BRASIL = "BRA_2022"
 
-# D10 -> índice em RELIGIOES. Códigos confirmados no TF_04810.pdf p.168.
-# Código 7 (Mórmon/Adventista/Testemunha de Jeová) vai para Evangélica
-# porque a Adventista domina a categoria no Brasil e o Censo IBGE a
-# classifica como evangélica de missão; 100 (acredita em Deus, sem
-# religião declarada) segue o critério do Censo para "sem religião".
+# Variáveis do CSES Módulo 6 (codebook part2). Confirmadas contra as
+# distribuições do ESEB (pipeline/raw/TF_04810.pdf): F2002 sexo (0=M,1=F),
+# F2001_A idade em anos, F2003 escolaridade (ISCED harmonizado), F2011
+# religião (códigos CSES), F2018 região (1=SE,2=NE,3=CO,4=N,5=S, mesma
+# ordem do ESEB REG), F3020_R autoposição esquerda-direita 0-10.
+MAPA_CSES = {"pais": "F1004", "sexo": "F2002", "idade": "F2001_A",
+             "escolaridade": "F2003", "religiao": "F2011",
+             "regiao": "F2018", "escala_lr": "F3020_R"}
+
+# F2018 (região CSES) -> índice na ordem de região do núcleo
+# (recode.py DIMENSOES: Norte0, Nordeste1, Sudeste2, Sul3, Centro-Oeste4).
+MAPA_REGIAO = {1: 2, 2: 1, 3: 4, 4: 0, 5: 3}
+
+# F2002 (gênero CSES) -> índice do núcleo (Homem0, Mulher1).
+MAPA_SEXO = {0: 0, 1: 1}
+
+# F2011 (religião CSES) -> índice em RELIGIOES. Códigos confirmados nos
+# rótulos do .sav para o Brasil. Mórmons (1502, n=12) vão para "Outras"
+# porque o CSES os separa dos protestantes/evangélicos e o Censo IBGE
+# também os conta à parte.
 MAPA_RELIGIAO = {
-    3: 0,                     # Católica
-    5: 1, 7: 1,               # Evangélica; Mórmon/Adventista/TJ
-    1: 2,                     # Budista
-    2: 2, 10: 2,              # Candomblé, Umbanda
-    4: 2,                     # Espírita Kardecista/Espiritualista
-    6: 2,                     # Judaica
-    9: 2,                     # Seicho-No-Ie/Messiânica/Perfeita Liberdade
-    101: 2, 102: 2,           # Pagão; "Cristão" genérico (sem denominação)
-    96: 3, 97: 3, 100: 3,     # Ateu/agnóstico; Não tem religião; Acredita em Deus
-    # 98 (Não respondeu) e 99 (Não sabe) fora de propósito -> .get() retorna
-    # None e o respondente é descartado (ver recodificar_religiao).
+    1101: 0,                      # Católica romana
+    1200: 1,                      # Protestante/evangélica (sem denominação)
+    2000: 2, 4000: 2, 6400: 2,    # Judaica, Budista, Novas religiões
+    7200: 2,                      # Espírita/Espiritismo
+    7900: 2, 7901: 2,             # Etnorreligiões (umbanda/candomblé/outras)
+    1502: 2, 9600: 2,             # Mórmons; Outra não especificada
+    8200: 3, 8300: 3,             # Ateu; Nenhuma
+    # 9997/9998 (recusou/não sabe) fora de propósito -> .get() retorna None
+    # e o respondente é descartado (ver recodificar_religiao).
 }
 
-# D03 -> índice em escol5 (mesmos 5 níveis do núcleo PNADC, ver recode.py).
-# Códigos confirmados no TF_04810.pdf p.12: 1 analfabeto, 2 primário
-# incompleto, 3 primário completo, 4 ginásio incompleto, 5 ginásio completo,
-# 6 colegial incompleto, 7 colegial completo, 8 universitário incompleto/
-# técnico, 9 universitário completo, 10 pós-graduação.
+# F2003 (escolaridade CSES, escala ISCED) -> índice em escol5 (mesmos 5
+# níveis do núcleo PNADC, ver recode.py). O ISCED harmonizado não distingue
+# "superior incompleto" — sem impacto, porque es3() colapsa escol5 3 e 4 no
+# mesmo grupo de conditioning do bônus.
 MAPA_ESCOLARIDADE = {
-    1: 0, 2: 0, 3: 0, 4: 0,  # até fundamental incompleto
-    5: 1, 6: 1,              # fundamental completo / médio incompleto
-    7: 2,                    # médio completo
-    8: 3,                    # superior incompleto (ou técnico pós-médio)
-    9: 4, 10: 4,             # superior completo / pós-graduação
-    # 99 (Não respondeu) fora de propósito -> .get() retorna None e o
-    # respondente é descartado (ver recodificar_escolaridade).
-}
-
-# Substrings usadas para sugerir colunas candidatas quando um nome do
-# MAPA_ESEB não bate com o .sav (religião, escolaridade, sexo, idade, UF,
-# escala esquerda-direita).
-_PISTAS_COLUNAS = {
-    "religiao": "reli",
-    "escolaridade": "esc",
-    "sexo": "sexo",
-    "idade": "idade",
-    "uf": "uf",
-    "escala_lr": "esquerda",
+    96: 0, 1: 0, 2: 0,   # Nenhuma; ISCED 0 (infantil); ISCED 1 (primário)
+    3: 1,                # ISCED 2 (fundamental II)
+    4: 2,               # ISCED 3 (médio)
+    7: 4, 8: 4,          # ISCED 6 (bacharelado); ISCED 7 (mestrado+)
+    # 97 (recusou) fora de propósito -> .get() retorna None e o respondente
+    # é descartado (ver recodificar_escolaridade).
 }
 
 
@@ -109,22 +109,6 @@ def montar_niveis(respondentes, n_minimo=30):
     return dist
 
 
-def validar_mapa_eseb(colunas):
-    faltantes = [campo for campo, col in MAPA_ESEB.items() if col not in colunas]
-    if faltantes:
-        candidatas = {
-            campo: [c for c in colunas
-                    if _PISTAS_COLUNAS.get(campo, campo).lower() in c.lower()]
-            for campo in faltantes
-        }
-        raise ValueError(
-            f"MAPA_ESEB aponta para colunas ausentes no .sav: "
-            f"{[MAPA_ESEB[c] for c in faltantes]} (campos: {faltantes}). "
-            f"Colunas candidatas por substring: {candidatas}. "
-            "Confira o codebook do ESEB 2022 (CESOP) e ajuste MAPA_ESEB."
-        )
-
-
 def _faixa6(idade):
     if idade is None or idade < 18:
         return None
@@ -134,10 +118,10 @@ def _faixa6(idade):
     return 5
 
 
-def _regiao(uf):
-    if uf is None:
+def recodificar_regiao(codigo):
+    if codigo is None:
         return None
-    return {1: 0, 2: 1, 3: 2, 4: 3, 5: 4}.get(int(uf) // 10)
+    return MAPA_REGIAO.get(int(codigo))
 
 
 def recodificar_religiao(codigo):
@@ -153,20 +137,20 @@ def recodificar_escolaridade(codigo):
 
 
 def recodificar_respondente(linha):
-    """Recodifica uma linha bruta do .sav (dict de coluna -> valor) para
+    """Recodifica uma linha bruta do CSES (dict de coluna -> valor) para
     dict(regiao, sexo, f3, e3, rel, pol). Retorna None se algum campo
     obrigatório (regiao, sexo, faixa etária, escolaridade, religião) estiver
     ausente/NS-NR — política ausente vira 'não se posiciona' (índice 3), não
     descarta o respondente."""
-    uf = linha.get(MAPA_ESEB["uf"])
-    sexo_bruto = linha.get(MAPA_ESEB["sexo"])
-    idade = linha.get(MAPA_ESEB["idade"])
-    escol_bruta = linha.get(MAPA_ESEB["escolaridade"])
-    religiao_bruta = linha.get(MAPA_ESEB["religiao"])
-    escala_bruta = linha.get(MAPA_ESEB["escala_lr"])
+    regiao_bruta = linha.get(MAPA_CSES["regiao"])
+    sexo_bruto = linha.get(MAPA_CSES["sexo"])
+    idade = linha.get(MAPA_CSES["idade"])
+    escol_bruta = linha.get(MAPA_CSES["escolaridade"])
+    religiao_bruta = linha.get(MAPA_CSES["religiao"])
+    escala_bruta = linha.get(MAPA_CSES["escala_lr"])
 
-    regiao = _regiao(uf)
-    sexo = {1: 0, 2: 1}.get(int(sexo_bruto)) if sexo_bruto is not None else None
+    regiao = recodificar_regiao(regiao_bruta)
+    sexo = MAPA_SEXO.get(int(sexo_bruto)) if sexo_bruto is not None else None
     faixa6 = _faixa6(idade)
     escol5 = recodificar_escolaridade(escol_bruta)
     rel = recodificar_religiao(religiao_bruta)
@@ -180,9 +164,10 @@ def recodificar_respondente(linha):
 
 
 def main():
-    caminho = config.RAW / "eseb2022.sav"
-    df, meta = pyreadstat.read_sav(caminho)
-    validar_mapa_eseb(set(df.columns))
+    caminho = config.RAW / "cses6" / "cses6.sav"
+    colunas = list(MAPA_CSES.values())
+    df, meta = pyreadstat.read_sav(caminho, usecols=colunas)
+    df = df[df[MAPA_CSES["pais"]] == BRASIL]
 
     respondentes = []
     for reg in df.to_dict("records"):
@@ -194,7 +179,7 @@ def main():
     dist = montar_niveis(respondentes)
     saida = {
         "meta": {
-            "fonte": "ESEB 2022 (CESOP/UNICAMP)",
+            "fonte": "ESEB 2022 via CSES Módulo 6 (CSES, Universidade de Michigan)",
             "n": len(respondentes),
             "religiao": RELIGIOES,
             "politica": POLITICAS,

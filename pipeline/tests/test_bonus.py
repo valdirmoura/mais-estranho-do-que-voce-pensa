@@ -1,7 +1,7 @@
 from quizbr.bonus import (
     fe3, es3, politica_de_escala, montar_niveis,
-    recodificar_escolaridade, recodificar_respondente,
-    MAPA_ESEB
+    recodificar_escolaridade, recodificar_regiao, recodificar_respondente,
+    MAPA_CSES
 )
 
 def test_grupos():
@@ -26,16 +26,35 @@ def test_recuo_para_nivel_com_n_suficiente():
     # nível global sempre existe
     assert dist["3"][""]["1|2"] == 1.0
 
-def test_escolaridade_unmapped_drops_respondent():
-    # Código de escolaridade não mapeado (ex: 99 para NS/NR) retorna None,
-    # respondente é descartado, não miscategorizado.
+def test_regiao_cses_para_ordem_do_nucleo():
+    # F2018: 1=Sudeste, 2=Nordeste, 3=Centro-Oeste, 4=Norte, 5=Sul ->
+    # ordem do núcleo (Norte0, Nordeste1, Sudeste2, Sul3, Centro-Oeste4).
+    assert [recodificar_regiao(c) for c in (1, 2, 3, 4, 5)] == [2, 1, 4, 0, 3]
+    assert recodificar_regiao(None) is None
+
+def _linha_valida(**over):
     linha = {
-        MAPA_ESEB["uf"]: 1,
-        MAPA_ESEB["sexo"]: 1,
-        MAPA_ESEB["idade"]: 30,
-        MAPA_ESEB["escolaridade"]: 99,  # Unmapped code
-        MAPA_ESEB["religiao"]: 1,
-        MAPA_ESEB["escala_lr"]: 5,
+        MAPA_CSES["regiao"]: 1,
+        MAPA_CSES["sexo"]: 0,
+        MAPA_CSES["idade"]: 30,
+        MAPA_CSES["escolaridade"]: 4,   # ISCED 3 -> médio
+        MAPA_CSES["religiao"]: 1101,    # Católica
+        MAPA_CSES["escala_lr"]: 5,
     }
-    resultado = recodificar_respondente(linha)
-    assert resultado is None
+    linha.update(over)
+    return linha
+
+def test_escolaridade_unmapped_drops_respondent():
+    # Código de escolaridade não mapeado (97 = recusou) retorna None,
+    # respondente é descartado, não miscategorizado.
+    assert recodificar_respondente(_linha_valida(**{MAPA_CSES["escolaridade"]: 97})) is None
+
+def test_respondente_cses_valido():
+    # idade 30 -> faixa6=1 -> fe3=0; ISCED 3 -> escol5=2 -> es3=1.
+    r = recodificar_respondente(_linha_valida())
+    assert r == dict(regiao=2, sexo=0, f3=0, e3=1, rel=0, pol=1)
+
+def test_escala_lr_nao_posicionada_nao_descarta():
+    # F3020_R = 98 (não sabe onde se colocar) -> política 3, sem descartar.
+    r = recodificar_respondente(_linha_valida(**{MAPA_CSES["escala_lr"]: 98}))
+    assert r is not None and r["pol"] == 3

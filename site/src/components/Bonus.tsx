@@ -4,10 +4,10 @@ import { buscarBonus } from "../lib/lookup";
 
 const DISCLAIMER = `As 8 perguntas principais vêm de uma única pesquisa \
 (PNAD Contínua/IBGE), o que permite calcular sua combinação exata. Religião \
-e política não existem na PNAD: usamos o ESEB 2022 (CESOP/UNICAMP, ~2 mil \
-entrevistados) e estimamos a probabilidade condicionada ao seu perfil \
-demográfico (região, sexo, idade, escolaridade). É uma aproximação honesta, \
-não uma contagem exata — por isso o bônus é separado.`;
+e política não existem na PNAD: usamos o ESEB 2022, via CSES Módulo 6 \
+(~2 mil entrevistados), e estimamos a probabilidade condicionada ao seu \
+perfil demográfico (região, sexo, idade, escolaridade). É uma aproximação \
+honesta, não uma contagem exata — por isso o bônus é separado.`;
 
 export default function Bonus({ core, indices }:
   { core: Core; indices: number[] }) {

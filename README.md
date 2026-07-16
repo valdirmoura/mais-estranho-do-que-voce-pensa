@@ -76,17 +76,25 @@ Para atualizar para um novo ano da PNAD: edite `pipeline/src/quizbr/config.py`
 `VAR_INTERNET`, `VAR_RDPC`) seguindo o procedimento de confirmação
 documentado em `pipeline/README.md`, depois rode `baixar` e `agregar` de novo.
 
-### 2. Bônus (ESEB 2022 — manual)
+### 2. Bônus (ESEB 2022 via CSES Módulo 6 — manual)
 
-O ESEB exige cadastro gratuito no CESOP/UNICAMP:
+Religião e política vêm do ESEB 2022. Em vez do `.sav` nativo do CESOP
+(que exige cadastro), usamos o **componente brasileiro do CSES Módulo 6**
+(Comparative Study of Electoral Systems, Universidade de Michigan) — mesmo
+estudo, n=2001, com download direto e sem cadastro:
 
-1. Acesse https://cesop.unicamp.br/, localize "ESEB 2022" no catálogo.
-2. Baixe o arquivo SPSS (`.sav`) e salve como `pipeline/raw/eseb2022.sav`.
+1. Baixe em https://cses.org/data-download/cses-module-6-2021-2026/ os
+   arquivos SPSS e codebook (`cses6_spss.zip`, `cses6_codebook.zip`).
+2. Extraia para `pipeline/raw/cses6/` (deve conter `cses6.sav`).
 3. Rode:
 
 ```bash
-python -m quizbr.bonus       # gera pipeline/out/bonus.json
+python -m quizbr.bonus       # filtra BRA_2022 e gera pipeline/out/bonus.json
 ```
+
+`bonus.py` usa as variáveis harmonizadas do CSES (F2002 sexo, F2001_A idade,
+F2003 escolaridade ISCED, F2011 religião, F2018 região, F3020_R esquerda-
+direita), confirmadas contra o codebook do ESEB (`pipeline/raw/TF_04810.pdf`).
 
 O site funciona normalmente sem esse arquivo — o bônus apenas fica
 indisponível (degradação graciosa).
@@ -130,14 +138,12 @@ certificado HTTPS automaticamente.
 
 ## Pendências (para o usuário)
 
-- [ ] **ESEB 2022 (bônus religião/política):** aguardando o CESOP/UNICAMP
-      liberar o acesso ao `.sav` (re-solicitado por e-mail em 2026-07-14).
-      Os mapeamentos de `pipeline/src/quizbr/bonus.py` já foram confirmados
-      contra o codebook (`pipeline/raw/TF_04810.pdf`). Quando o arquivo
-      chegar: salvar como `pipeline/raw/eseb2022.sav` →
-      `python -m quizbr.bonus` → conferir margem de religião vs Censo 2022
-      (~57% católica, ~27% evangélica) → `npm run dados` (em `site/`) →
-      push → deploy na VPS.
 - [ ] **Divulgar o link** para amigos e conhecidos — o restante é orgânico.
       Estatísticas anônimas:
       `curl https://voceestranho.anmaru.com/api/estatisticas`.
+
+Concluído: o bônus de religião/política está **ativo em produção**, com dados
+do ESEB 2022 via CSES Módulo 6 (ver "Bônus" acima). Nota: o ESEB não é
+ponderado para representatividade populacional (~49% católica, ~31%
+evangélica na amostra, vs ~57%/27% no Censo 2022), por isso o bônus é
+rotulado no site como aproximação, separado do resultado principal.
