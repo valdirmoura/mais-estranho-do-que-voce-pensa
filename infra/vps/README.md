@@ -6,7 +6,7 @@ externa `vps_public` criada (ver `~/vps-gateway`).
 ## Primeira vez
 
 ```bash
-git clone https://github.com/valdirmoura/mais-estranho-do-que-voce-pensa.git ~/voceestranho
+git clone https://github.com/valdirmoura/voce-estranho.git ~/voceestranho
 cd ~/voceestranho/infra/vps
 cp .env.example .env
 docker compose --env-file .env -f compose.yml up -d --build

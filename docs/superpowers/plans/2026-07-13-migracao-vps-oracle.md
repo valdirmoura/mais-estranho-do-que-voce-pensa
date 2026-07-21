@@ -33,7 +33,7 @@
   recarregar o Caddy.
 - Commits: Conventional Commits em pt-BR, footer
   `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- Repositório GitHub é público: `https://github.com/valdirmoura/mais-estranho-do-que-voce-pensa` — clone HTTPS na VPS não precisa de credencial.
+- Repositório GitHub é público: `https://github.com/valdirmoura/voce-estranho` — clone HTTPS na VPS não precisa de credencial.
 
 ---
 
@@ -448,7 +448,7 @@ externa `vps_public` criada (ver `~/vps-gateway`).
 ## Primeira vez
 
 \`\`\`bash
-git clone https://github.com/valdirmoura/mais-estranho-do-que-voce-pensa.git ~/voceestranho
+git clone https://github.com/valdirmoura/voce-estranho.git ~/voceestranho
 cd ~/voceestranho/infra/vps
 cp .env.example .env
 docker compose --env-file .env -f compose.yml up -d --build
@@ -550,7 +550,7 @@ adicionando apenas — nunca removendo ou editando blocos existentes.
 
 ```bash
 KEY="C:\Users\valdir\apps\anmaru\VPS Oracle\ssh-key-2026-07-08.key"
-ssh -i "$KEY" ubuntu@147.15.78.16 "test -d ~/voceestranho && (cd ~/voceestranho && git pull) || git clone https://github.com/valdirmoura/mais-estranho-do-que-voce-pensa.git ~/voceestranho"
+ssh -i "$KEY" ubuntu@147.15.78.16 "test -d ~/voceestranho && (cd ~/voceestranho && git pull) || git clone https://github.com/valdirmoura/voce-estranho.git ~/voceestranho"
 ```
 Expected: `Cloning into 'voceestranho'...` (primeira vez) ou `Already
 up to date.`/lista de arquivos atualizados (vezes seguintes).
